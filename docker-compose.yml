@@ -1,0 +1,55 @@
+version: '3'
+
+volumes:
+  psql-data:
+
+services:
+  nwt_c:
+
+    image: maven:alpine
+    container_name: nwt
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+    volumes:
+      - ${APP_PATH}:${APP_DESTINATION_PATH}
+    networks:
+      app-env:
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres 
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - .//postgres-data:/var/lib/postgresql/data:rw
+    ports:
+      - 5432:5432
+    networks:
+      app-env:
+      interface:
+  
+  pgadmin:
+    image: fenglc/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+    ports:
+      - 5050:5050
+    environment:
+      - DEFAULT_USER=${DEFAULT_USER}
+      - DEFAULT_PASSWORD=${DEFAULT_PASSWORD}
+    networks:
+      app-env:
+      interface:
+    
+networks:
+  app-env:
+  interface:
+
